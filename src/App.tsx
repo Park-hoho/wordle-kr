@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 import './App.css';
 
 function App() {
@@ -14,26 +14,38 @@ function App() {
     ['', '', '', '', ''],
     ['', '', '', '', '']
   ]);
-  let currentRow = 0;
-  let position = 0;
+  let currentRow = useRef(0);
+  let position = useRef(0);
   const [result, setResult] = useState(['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']);
-
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
   }, [])
 
-  const handleClick = (word: string): void => {
-    if (!checkEnterAndBackspace(word))
-      onClickWord(word);
+  const handleClick = (e: any): void => {
+    const word: string = e.target.id;
+    if (!checkEnterBackspaceShift(word)) {
+      onClickWord(word)
+        .then(() => {
+          if (position.current < 5) position.current += 1;
+          console.log("After: [" + currentRow.current + "], [" + position.current + "]");
+          console.log("");
+        })
+    }
   }
 
   const handleKeyDown = (e: any): void => {
-    if (!checkEnterAndBackspace(e.key))
-      onClickWord(changeKeyWord(e.key));
+    if (!checkEnterBackspaceShift(e.key)) {
+      onClickWord(changeKeyWord(e.key))
+        .then(() => {
+          if (position.current < 5) position.current += 1;
+          console.log("After: [" + currentRow.current + "], [" + position.current + "]");
+          console.log("");
+        })
+    }
   }
 
-  const checkEnterAndBackspace = (word: string): boolean => {
+  const checkEnterBackspaceShift = (word: string): boolean => {
     switch (word) {
       case 'Enter':
         onClickEnter();
@@ -90,25 +102,24 @@ function App() {
   }
 
   // 글자입력
-  const onClickWord = (word: string | undefined): void => {
+  const onClickWord = async (word: string | undefined): Promise<void> => {
     if (word) {
-      if (position < 5) {
-        setBoardState((prev) => {
+      if (position.current < 5) {
+        await setBoardState((prev) => {
           const news = [...prev];
-          news[currentRow][position] = word;
+          console.log("Insert: [" + currentRow.current + "], [" + position.current + "]");
+          news[currentRow.current][position.current] = word;
           return news;
-        });
-        position++;
-        console.log(position + " " + word);
+        })
       } else {
         console.log('더 이상 입력할 수 없습니다.');
       }
+
     }
   }
 
   // 엔터입력
   const onClickEnter = (): void => {
-    console.log('Enter!!');
     // 사전에 있는 단어인지 체크 메서드
       // 오늘의 단어와 맞는지 체크 메서드
 
@@ -119,31 +130,30 @@ function App() {
         // 정답과 글자의 위치 체크 후 keyboadr, board에 표시 ( 같은위치 같은값, 다른위치 같은값 )
         // 다음 행으로 넘어감
         // 만약 다음 행이없으면 게임 끝
-    if (position === 5) {
-      currentRow++;
-      position = 0;
+    if (position.current === 5) {
+      currentRow.current += 1;
+      position.current = 0;
     } else {
-      if (currentRow < 6) {
+      if (currentRow.current < 6) {
         console.log('꽉채워주세요');
       } else {
         console.log('오늘 게임 완료');
       }
     }
-    console.log(currentRow);
+    console.log('Enter!' + currentRow.current);
   }
 
   // 백스페이스 입력
   const onClickBackspace = (): void => {
-    console.log('Backspace!!');
-    if (0 <= position) {
-      position = position === 0 ? 0 : position - 1;
+    if (0 <= position.current) {
+      position.current = position.current === 0 ? 0 : position.current - 1;
 
       setBoardState((prev) => {
         const news = [...prev];
-        news[currentRow][position] = '';
+        news[currentRow.current][position.current] = '';
         return news;
       });
-      console.log(position);
+      console.log('Backspace!' + position.current);
     }
   }
 
@@ -152,7 +162,7 @@ function App() {
 
       <header>
         <h1>WORDLE KR</h1>
-        {currentRow}
+        {currentRow.current}
       </header>
 
       <main>
@@ -182,37 +192,37 @@ function App() {
                 className="key"
                 key={i}
                 id={i}
-                onClick={() => handleClick(i)}
+                onClick={handleClick}
               >{i}</button>
             )
           }
         </div>
         <div className="row">
-          <button className="key" onClick={() => handleClick('Shift')}>Shift</button>
+          <button className="key" id="Shift" onClick={handleClick}>Shift</button>
           {
             keyRow2.map(i =>
               <button
                 className="key"
                 key={i}
                 id={i}
-                onClick={() => handleClick(i)}
+                onClick={handleClick}
               >{i}</button>
             )
           }
         </div>
         <div className="row">
-          <button className="key" onClick={() => handleClick('Enter')}>Enter</button>
+          <button className="key" id="Enter" onClick={handleClick}>Enter</button>
           {
             keyRow3.map(i =>
               <button
                 className="key"
                 key={i}
                 id={i}
-                onClick={() => handleClick(i)}
+                onClick={handleClick}
               >{i}</button>
             )
           }
-          <button className="key" onClick={() => handleClick('Backspace')}>Bcksp</button>
+          <button className="key" id="Backspace" onClick={handleClick}>Bcksp</button>
         </div>
       </div>
 
