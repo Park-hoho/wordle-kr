@@ -1,38 +1,123 @@
-.App {
-  text-align: center;
+:root {
+  --key-bg: #e8e8e8;
+  --key-text-color: #1b1f2c;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow-y: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#root {
+  height: 100vh;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
+.wrap {
+  width: 100%;
+  max-width: 500px;
+  height: 100vh;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+}
+
+/*
+header
+*/
+
+header {
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: black;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+/*
+center
+*/
+
+main {
+  display: flex;
   align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  overflow: hidden;
+  flex-direction: column;
 }
 
-.App-link {
-  color: #61dafb;
+.board {
+  width: 350px;
+  height: 420px;
+
+  display: grid;
+  grid-template-rows: repeat(6, 1fr);
+  grid-gap: 5px;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.board > .board-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-gap: 5px;
+}
+
+.tile {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 2rem;
+  line-height: 2rem;
+  font-weight: bold;
+  vertical-align: middle;
+  box-sizing: border-box;
+  user-select: none;
+  color: black;
+  border: 2px solid #dadada;
+}
+
+/*
+keyboard
+*/
+
+.keyboard {
+  height: 200px;
+  margin: 0 8px;
+  user-select: none;
+}
+
+.row {
+  display: flex;
+  width: 100%;
+  margin: 0 auto 8px;
+  touch-action: manipulation;
+  justify-content: center;
+}
+
+.key {
+  margin: 0 6px 0 0;
+  padding: 0 14px;
+  font-family: inherit;
+  font-weight: bold;
+  border: 0;
+  height: 58px;
+  border-radius: 4px;
+  cursor: pointer;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  background-color: var(--key-bg);
+  color: var(--key-text-color);
+  -webkit-tap-highlight-color: rgba(0,0,0,0.3);
+}
+
+.key:last-child {
+  content: '<';
 }
