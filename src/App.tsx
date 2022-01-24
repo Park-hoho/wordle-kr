@@ -16,7 +16,7 @@ function App() {
   ]);
   let currentRow = 0;
   let position = 0;
-  const [w, setW] = useState('');
+  const [result, setResult] = useState(['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']);
 
 
   useEffect(() => {
@@ -24,11 +24,13 @@ function App() {
   }, [])
 
   const handleClick = (word: string): void => {
-    if (!checkEnterAndBackspace(word)) onClickWord(word);
+    if (!checkEnterAndBackspace(word))
+      onClickWord(word);
   }
 
   const handleKeyDown = (e: any): void => {
-    if (!checkEnterAndBackspace(e.key)) onClickWord(changeKeyWord(e.key));
+    if (!checkEnterAndBackspace(e.key))
+      onClickWord(changeKeyWord(e.key));
   }
 
   const checkEnterAndBackspace = (word: string): boolean => {
@@ -90,28 +92,23 @@ function App() {
   // 글자입력
   const onClickWord = (word: string | undefined): void => {
     if (word) {
-      // 입력값 화면에 렌더
-      // console.log(word);
       if (position < 5) {
-        setBoardState(prevState => {
-          prevState[currentRow][position] = word;
-          return prevState;
-        })
+        setBoardState((prev) => {
+          const news = [...prev];
+          news[currentRow][position] = word;
+          return news;
+        });
         position++;
+        console.log(position + " " + word);
       } else {
         console.log('더 이상 입력할 수 없습니다.');
       }
-
-      console.log(boardState);
-      console.log(currentRow);
-      console.log(position);
     }
   }
 
   // 엔터입력
   const onClickEnter = (): void => {
     console.log('Enter!!');
-    // 진행중인 행의 단어 추출
     // 사전에 있는 단어인지 체크 메서드
       // 오늘의 단어와 맞는지 체크 메서드
 
@@ -122,21 +119,31 @@ function App() {
         // 정답과 글자의 위치 체크 후 keyboadr, board에 표시 ( 같은위치 같은값, 다른위치 같은값 )
         // 다음 행으로 넘어감
         // 만약 다음 행이없으면 게임 끝
-    if (position === 5 && currentRow < 6) {
+    if (position === 5) {
       currentRow++;
       position = 0;
     } else {
-      console.log('더 이상 게임을 할 수 없습니다.');
+      if (currentRow < 6) {
+        console.log('꽉채워주세요');
+      } else {
+        console.log('오늘 게임 완료');
+      }
     }
     console.log(currentRow);
   }
 
   // 백스페이스 입력
   const onClickBackspace = (): void => {
-    // 입력값 화면에 지움
     console.log('Backspace!!');
-    if (position > 0) {
-      position--;
+    if (0 <= position) {
+      position = position === 0 ? 0 : position - 1;
+
+      setBoardState((prev) => {
+        const news = [...prev];
+        news[currentRow][position] = '';
+        return news;
+      });
+      console.log(position);
     }
   }
 
