@@ -2,10 +2,10 @@ import React, {useEffect, useState, useRef} from 'react';
 import './App.css';
 
 function App() {
-  const keyRow1 = ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ']
+  const keyShiftRow = ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ'];
+  const keyRow1 = ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'];
   const keyRow2 = ['ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'];
   const keyRow3 = ['ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'];
-  const boardRow = ['first', 'second', 'third', 'fourth', 'fifth']
   const [boardState, setBoardState] = useState([
     ['', '', '', '', ''],
     ['', '', '', '', ''],
@@ -17,32 +17,28 @@ function App() {
   let currentRow = useRef(0);
   let position = useRef(0);
   const [result, setResult] = useState(['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']);
+  const [isShift, setIsShift] = useState(false);
+  const [boardWidth, setBoardWidth] = useState(350);
+  const [boardHeight, setboardHeight] = useState(420);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('resize', screenSize);
   }, [])
+
+  const screenSize = (e: any): void => {
+    console.log(11)
+    console.log(e.screenX);
+    console.log(e.screenY);
+  }
 
   const handleClick = (e: any): void => {
     const word: string = e.target.id;
-    if (!checkEnterBackspaceShift(word)) {
-      onClickWord(word)
-        .then(() => {
-          if (position.current < 5) position.current += 1;
-          console.log("After: [" + currentRow.current + "], [" + position.current + "]");
-          console.log("");
-        })
-    }
+    if (!checkEnterBackspaceShift(word)) onClickWord(word)
   }
 
   const handleKeyDown = (e: any): void => {
-    if (!checkEnterBackspaceShift(e.key)) {
-      onClickWord(changeKeyWord(e.key))
-        .then(() => {
-          if (position.current < 5) position.current += 1;
-          console.log("After: [" + currentRow.current + "], [" + position.current + "]");
-          console.log("");
-        })
-    }
+    if (!checkEnterBackspaceShift(e.key)) onClickWord(changeKeyWord(e.key))
   }
 
   const checkEnterBackspaceShift = (word: string): boolean => {
@@ -55,6 +51,7 @@ function App() {
         return true;
       case 'Shift':
         console.log('Shift!!');
+        setIsShift(!isShift);
         return true;
       default:
         return false;
@@ -102,20 +99,25 @@ function App() {
   }
 
   // 글자입력
-  const onClickWord = async (word: string | undefined): Promise<void> => {
+  const onClickWord = (word: string | undefined) => {
     if (word) {
       if (position.current < 5) {
-        await setBoardState((prev) => {
-          const news = [...prev];
-          console.log("Insert: [" + currentRow.current + "], [" + position.current + "]");
-          news[currentRow.current][position.current] = word;
-          return news;
+        updateBoardState(word).then(() => {
+          position.current += 1;
         })
       } else {
         console.log('더 이상 입력할 수 없습니다.');
       }
-
     }
+  }
+
+  const updateBoardState = async (word: string) => {
+    await setBoardState((prev) => {
+      const news = [...prev];
+      console.debug("Insert: [" + currentRow.current + "][" + position.current + "]");
+      news[currentRow.current][position.current] = word;
+      return news;
+    })
   }
 
   // 엔터입력
@@ -158,7 +160,7 @@ function App() {
   }
 
   return (
-    <div className="wrap">
+    <>
 
       <header>
         <h1>WORDLE KR</h1>
@@ -166,7 +168,10 @@ function App() {
       </header>
 
       <main>
-        <div className="board">
+        <div className="board" style={{
+          width: boardWidth + 'px',
+          height: boardHeight + 'px'
+        }}>
           {
             boardState.map((row, i) => (
               <div
@@ -198,7 +203,11 @@ function App() {
           }
         </div>
         <div className="row">
-          <button className="key" id="Shift" onClick={handleClick}>Shift</button>
+          <button
+            className={(isShift && 'key-shift--active') + ' key' + ' key-shift'}
+            id="Shift"
+            onClick={handleClick}
+          >Shift</button>
           {
             keyRow2.map(i =>
               <button
@@ -211,7 +220,7 @@ function App() {
           }
         </div>
         <div className="row">
-          <button className="key" id="Enter" onClick={handleClick}>Enter</button>
+          <button className="key key-enter" id="Enter" onClick={handleClick}>Enter</button>
           {
             keyRow3.map(i =>
               <button
@@ -222,11 +231,11 @@ function App() {
               >{i}</button>
             )
           }
-          <button className="key" id="Backspace" onClick={handleClick}>Bcksp</button>
+          <button className="key key-bcksp" id="Backspace" onClick={handleClick}>Bcksp</button>
         </div>
       </div>
 
-    </div>
+    </>
   );
 }
 

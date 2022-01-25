@@ -3,25 +3,20 @@
   --key-text-color: #1b1f2c;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  height: 100vh;
+  height: 100%;
   overflow-y: hidden;
 }
 
 #root {
-  height: 100vh;
-}
-
-.wrap {
   width: 100%;
   max-width: 500px;
-  height: 100vh;
+  height: 100%;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
 /*
@@ -29,6 +24,7 @@ header
 */
 
 header {
+  padding: 0 16px;
   height: 60px;
   display: flex;
   align-items: center;
@@ -46,13 +42,11 @@ main {
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  flex-grow: 1;
   flex-direction: column;
 }
 
 .board {
-  width: 350px;
-  height: 420px;
-
   display: grid;
   grid-template-rows: repeat(6, 1fr);
   grid-gap: 5px;
@@ -101,7 +95,7 @@ keyboard
 
 .key {
   margin: 0 6px 0 0;
-  padding: 0 14px;
+  flex: 1;
   font-family: inherit;
   font-weight: bold;
   border: 0;
@@ -113,11 +107,27 @@ keyboard
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
-  background-color: var(--key-bg);
   color: var(--key-text-color);
+  background-color: var(--key-bg);
   -webkit-tap-highlight-color: rgba(0,0,0,0.3);
 }
 
 .key:last-child {
   content: '<';
+}
+
+.key-bcksp {
+
+}
+
+.key-enter {
+
+}
+
+.key-shift {
+
+}
+
+.key-shift--active {
+  background-color: #d9af80;
 }
