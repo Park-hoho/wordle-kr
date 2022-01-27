@@ -1,11 +1,13 @@
 import React, {useEffect, useState, useRef} from 'react';
 import './App.css';
+import Header from './components/Header';
 
 function App() {
-  const keyShiftRow = ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ'];
+  const keyShiftRow1 = ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ'];
   const keyRow1 = ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'];
   const keyRow2 = ['ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'];
   const keyRow3 = ['ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'];
+  const [keyRowFirst, setKeyRowFirst] = useState(keyRow1);
   const [boardState, setBoardState] = useState([
     ['', '', '', '', ''],
     ['', '', '', '', ''],
@@ -14,26 +16,17 @@ function App() {
     ['', '', '', '', ''],
     ['', '', '', '', '']
   ]);
+  const [tileState, setTileState] = useState(Array(5));
   let currentRow = useRef(0);
   let position = useRef(0);
-  const [result, setResult] = useState(['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']);
+  const result = ['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']
   const [isShift, setIsShift] = useState(false);
-  const [boardWidth, setBoardWidth] = useState(350);
-  const [boardHeight, setboardHeight] = useState(420);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
-    document.addEventListener('resize', screenSize);
   }, [])
 
-  const screenSize = (e: any): void => {
-    console.log(11)
-    console.log(e.screenX);
-    console.log(e.screenY);
-  }
-
-  const handleClick = (e: any): void => {
-    const word: string = e.target.id;
+  const handleClick = (word: string): void => {
     if (!checkEnterBackspaceShift(word)) onClickWord(word)
   }
 
@@ -49,9 +42,14 @@ function App() {
       case 'Backspace':
         onClickBackspace();
         return true;
-      case 'Shift':
+      case 'virtualKeyboardShift':
         console.log('Shift!!');
         setIsShift(!isShift);
+        if (!isShift) {
+          setKeyRowFirst(keyShiftRow1);
+        } else {
+          setKeyRowFirst(keyRow1);
+        }
         return true;
       default:
         return false;
@@ -123,18 +121,23 @@ function App() {
   // 엔터입력
   const onClickEnter = (): void => {
     // 사전에 있는 단어인지 체크 메서드
-      // 오늘의 단어와 맞는지 체크 메서드
+    // 오늘의 단어와 맞는지 체크 메서드
 
-      // true
-        // modal창으로 기록 표시
+    // true
+    // modal창으로 기록 표시
 
-      // false
-        // 정답과 글자의 위치 체크 후 keyboadr, board에 표시 ( 같은위치 같은값, 다른위치 같은값 )
-        // 다음 행으로 넘어감
-        // 만약 다음 행이없으면 게임 끝
+    // false
+    // 정답과 글자의 위치 체크 후 keyboadr, board에 표시 ( 같은위치 같은값, 다른위치 같은값 )
+    // 다음 행으로 넘어감
+    // 만약 다음 행이없으면 게임 끝
     if (position.current === 5) {
-      currentRow.current += 1;
-      position.current = 0;
+      console.log(boardState[currentRow.current]);
+      if (JSON.stringify(boardState[currentRow.current]) === JSON.stringify(result)) {
+        console.log('정답');
+      } else {
+        currentRow.current += 1;
+        position.current = 0;
+      }
     } else {
       if (currentRow.current < 6) {
         console.log('꽉채워주세요');
@@ -142,7 +145,7 @@ function App() {
         console.log('오늘 게임 완료');
       }
     }
-    console.log('Enter!' + currentRow.current);
+    console.log('Enter!');
   }
 
   // 백스페이스 입력
@@ -155,23 +158,15 @@ function App() {
         news[currentRow.current][position.current] = '';
         return news;
       });
-      console.log('Backspace!' + position.current);
+      console.log('Backspace!');
     }
   }
 
   return (
     <>
-
-      <header>
-        <h1>WORDLE KR</h1>
-        {currentRow.current}
-      </header>
-
+      <Header/>
       <main>
-        <div className="board" style={{
-          width: boardWidth + 'px',
-          height: boardHeight + 'px'
-        }}>
+        <div className="board">
           {
             boardState.map((row, i) => (
               <div
@@ -192,12 +187,12 @@ function App() {
       <div className="keyboard">
         <div className="row">
           {
-            keyRow1.map(i =>
+            keyRowFirst.map(i =>
               <button
                 className="key"
                 key={i}
                 id={i}
-                onClick={handleClick}
+                onClick={() => handleClick(i)}
               >{i}</button>
             )
           }
@@ -206,34 +201,37 @@ function App() {
           <button
             className={(isShift && 'key-shift--active') + ' key' + ' key-shift'}
             id="Shift"
-            onClick={handleClick}
-          >Shift</button>
+            onClick={() => handleClick('virtualKeyboardShift')}
+          >Shift
+          </button>
           {
             keyRow2.map(i =>
               <button
                 className="key"
                 key={i}
                 id={i}
-                onClick={handleClick}
+                onClick={() => handleClick(i)}
               >{i}</button>
             )
           }
         </div>
         <div className="row">
-          <button className="key key-enter" id="Enter" onClick={handleClick}>Enter</button>
+          <button className="key key-enter" id="Enter" onClick={() => handleClick('Enter')}>Enter</button>
           {
             keyRow3.map(i =>
               <button
                 className="key"
                 key={i}
                 id={i}
-                onClick={handleClick}
+                onClick={() => handleClick(i)}
               >{i}</button>
             )
           }
-          <button className="key key-bcksp" id="Backspace" onClick={handleClick}>Bcksp</button>
+          <button className="key key-bcksp" id="Backspace" onClick={() => handleClick('Backspace')}>Bcksp</button>
         </div>
       </div>
+
+
 
     </>
   );
