@@ -1,4 +1,17 @@
 import React, {useState} from 'react';
+import styled from "styled-components";
+
+const Popup = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.7);
+`;
 
 const Header = () => {
   const [isStatusPopup, setIsStatusPopup] = useState(false);
@@ -12,7 +25,7 @@ const Header = () => {
 
       {
         isStatusPopup && (
-          <div className="popup">
+          <Popup>
             <div className="popup-content">
               <h4>플레이 현황</h4>
               <div className="status">
@@ -23,7 +36,7 @@ const Header = () => {
                 <button className="button button-share">공유하기</button>
               </div>
             </div>
-          </div>
+          </Popup>
         )
       }
     </>

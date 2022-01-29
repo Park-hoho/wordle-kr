@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useRef} from 'react';
 import './App.css';
 import Header from './components/Header';
+import styled from "styled-components";
 
 function App() {
   const keyShiftRow1 = ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ'];
@@ -43,13 +44,7 @@ function App() {
         onClickBackspace();
         return true;
       case 'virtualKeyboardShift':
-        console.log('Shift!!');
-        setIsShift(!isShift);
-        if (!isShift) {
-          setKeyRowFirst(keyShiftRow1);
-        } else {
-          setKeyRowFirst(keyRow1);
-        }
+        onClickShift();
         return true;
       default:
         return false;
@@ -162,10 +157,20 @@ function App() {
     }
   }
 
+  const onClickShift = (): void => {
+    console.log('Shift!!');
+    setIsShift(!isShift);
+    if (!isShift) {
+      setKeyRowFirst(keyShiftRow1);
+    } else {
+      setKeyRowFirst(keyRow1);
+    }
+  }
+
   return (
     <>
       <Header/>
-      <main>
+      <Main>
         <div className="board">
           {
             boardState.map((row, i) => (
@@ -182,7 +187,7 @@ function App() {
             ))
           }
         </div>
-      </main>
+      </Main>
 
       <div className="keyboard">
         <div className="row">
@@ -236,5 +241,14 @@ function App() {
     </>
   );
 }
+
+const Main = styled.main`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-grow: 1;
+  flex-direction: column;
+`;
 
 export default App;
