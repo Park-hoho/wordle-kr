@@ -13,7 +13,7 @@ const Popup = styled.div`
   background-color: rgba(0, 0, 0, 0.7);
 `;
 
-const Header = () => {
+function Header() {
   const [isStatusPopup, setIsStatusPopup] = useState(false);
 
   return (
@@ -41,6 +41,6 @@ const Header = () => {
       }
     </>
   );
-};
+}
 
 export default Header;

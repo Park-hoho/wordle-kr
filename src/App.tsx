@@ -2,13 +2,9 @@ import React, {useEffect, useState, useRef} from 'react';
 import './App.css';
 import Header from './components/Header';
 import styled from "styled-components";
+import KeyBoard from "./components/KeyBoard";
 
 function App() {
-  const keyShiftRow1 = ['ㅃ', 'ㅉ', 'ㄸ', 'ㄲ', 'ㅆ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅒ', 'ㅖ'];
-  const keyRow1 = ['ㅂ', 'ㅈ', 'ㄷ', 'ㄱ', 'ㅅ', 'ㅛ', 'ㅕ', 'ㅑ', 'ㅐ', 'ㅔ'];
-  const keyRow2 = ['ㅁ', 'ㄴ', 'ㅇ', 'ㄹ', 'ㅎ', 'ㅗ', 'ㅓ', 'ㅏ', 'ㅣ'];
-  const keyRow3 = ['ㅋ', 'ㅌ', 'ㅊ', 'ㅍ', 'ㅠ', 'ㅜ', 'ㅡ'];
-  const [keyRowFirst, setKeyRowFirst] = useState(keyRow1);
   const [boardState, setBoardState] = useState([
     ['', '', '', '', ''],
     ['', '', '', '', ''],
@@ -21,15 +17,10 @@ function App() {
   let currentRow = useRef(0);
   let position = useRef(0);
   const result = ['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']
-  const [isShift, setIsShift] = useState(false);
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
   }, [])
-
-  const handleClick = (word: string): void => {
-    if (!checkEnterBackspaceShift(word)) onClickWord(word)
-  }
 
   const handleKeyDown = (e: any): void => {
     if (!checkEnterBackspaceShift(e.key)) onClickWord(changeKeyWord(e.key))
@@ -43,14 +34,12 @@ function App() {
       case 'Backspace':
         onClickBackspace();
         return true;
-      case 'virtualKeyboardShift':
-        onClickShift();
-        return true;
       default:
         return false;
     }
   }
 
+  // 영어 -> 한글
   const changeKeyWord = (word: string): string => {
     const map = new Map();
     map.set('Q', 'ㅃ');
@@ -91,6 +80,18 @@ function App() {
     return map.get(word);
   }
 
+
+
+  // boardState 값 변경
+  const updateBoardState = async (word: string) => {
+    await setBoardState((prev) => {
+      const news = [...prev];
+      console.debug("Insert: [" + currentRow.current + "][" + position.current + "]");
+      news[currentRow.current][position.current] = word;
+      return news;
+    })
+  }
+
   // 글자입력
   const onClickWord = (word: string | undefined) => {
     if (word) {
@@ -102,15 +103,6 @@ function App() {
         console.log('더 이상 입력할 수 없습니다.');
       }
     }
-  }
-
-  const updateBoardState = async (word: string) => {
-    await setBoardState((prev) => {
-      const news = [...prev];
-      console.debug("Insert: [" + currentRow.current + "][" + position.current + "]");
-      news[currentRow.current][position.current] = word;
-      return news;
-    })
   }
 
   // 엔터입력
@@ -157,16 +149,6 @@ function App() {
     }
   }
 
-  const onClickShift = (): void => {
-    console.log('Shift!!');
-    setIsShift(!isShift);
-    if (!isShift) {
-      setKeyRowFirst(keyShiftRow1);
-    } else {
-      setKeyRowFirst(keyRow1);
-    }
-  }
-
   return (
     <>
       <Header/>
@@ -188,56 +170,11 @@ function App() {
           }
         </div>
       </Main>
-
-      <div className="keyboard">
-        <div className="row">
-          {
-            keyRowFirst.map(i =>
-              <button
-                className="key"
-                key={i}
-                id={i}
-                onClick={() => handleClick(i)}
-              >{i}</button>
-            )
-          }
-        </div>
-        <div className="row">
-          <button
-            className={(isShift && 'key-shift--active') + ' key' + ' key-shift'}
-            id="Shift"
-            onClick={() => handleClick('virtualKeyboardShift')}
-          >Shift
-          </button>
-          {
-            keyRow2.map(i =>
-              <button
-                className="key"
-                key={i}
-                id={i}
-                onClick={() => handleClick(i)}
-              >{i}</button>
-            )
-          }
-        </div>
-        <div className="row">
-          <button className="key key-enter" id="Enter" onClick={() => handleClick('Enter')}>Enter</button>
-          {
-            keyRow3.map(i =>
-              <button
-                className="key"
-                key={i}
-                id={i}
-                onClick={() => handleClick(i)}
-              >{i}</button>
-            )
-          }
-          <button className="key key-bcksp" id="Backspace" onClick={() => handleClick('Backspace')}>Bcksp</button>
-        </div>
-      </div>
-
-
-
+      <KeyBoard
+        onClickWord={onClickWord}
+        onClickBackspace={onClickBackspace}
+        onClickEnter={onClickEnter}
+      />
     </>
   );
 }
