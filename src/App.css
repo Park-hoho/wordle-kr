@@ -20,20 +20,6 @@ html, body {
 }
 
 /*
-header
-*/
-
-header {
-  padding: 0 16px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: black;
-  border-bottom: 1px solid #e1e1e1;
-}
-
-/*
 center
 */
 
