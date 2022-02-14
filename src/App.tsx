@@ -3,20 +3,25 @@ import './App.css';
 import Header from './components/Header';
 import styled from "styled-components";
 import KeyBoard from "./components/KeyBoard";
+import GameService from "./service/GameService";
+
+enum Status {
+  IN_PROGRESS,
+  LOSE,
+  WIN
+}
 
 function App() {
-  const [boardState, setBoardState] = useState([
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', '']
-  ]);
+  const gs = new GameService();
+
+  const [boardState, setBoardState] = useState(gs.boardState);
   const [tileState, setTileState] = useState(Array(5));
+  const [gameStatus, setGameStatus] = useState(gs.gameStatus);
   let currentRow = useRef(0);
   let position = useRef(0);
-  const result = ['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ']
+
+
+  const result = ['ㅎ', 'ㅏ', 'ㄴ', 'ㅡ', 'ㄹ'];
 
   useEffect(() => {
     document.addEventListener('keydown', handleKeyDown);
@@ -107,16 +112,6 @@ function App() {
 
   // 엔터입력
   const onClickEnter = (): void => {
-    // 사전에 있는 단어인지 체크 메서드
-    // 오늘의 단어와 맞는지 체크 메서드
-
-    // true
-    // modal창으로 기록 표시
-
-    // false
-    // 정답과 글자의 위치 체크 후 keyboadr, board에 표시 ( 같은위치 같은값, 다른위치 같은값 )
-    // 다음 행으로 넘어감
-    // 만약 다음 행이없으면 게임 끝
     if (position.current === 5) {
       console.log(boardState[currentRow.current]);
       if (JSON.stringify(boardState[currentRow.current]) === JSON.stringify(result)) {
